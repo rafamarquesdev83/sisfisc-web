@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block titulo %}Funcionários{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina">
+  <h1>Efetivo</h1>
+  <a href="{{ url_for('funcionarios.novo') }}" class="botao primario">Novo funcionário</a>
+</div>
+
+<div class="tabela-wrap">
+  <table class="tabela">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Matrícula</th>
+        <th>Posto</th>
+        <th>Escala</th>
+        <th>Almoço</th>
+        <th>Carga</th>
+        <th>Situação</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for f in funcionarios %}
+      <tr class="{% if not f['ativo'] %}inativo{% endif %}">
+        <td>{{ f['nome'] }}</td>
+        <td>{{ f['matricula'] }}</td>
+        <td>{{ f['posto'] }}</td>
+        <td>{{ f['entrada_escala'] }} - {{ f['saida_escala'] }}</td>
+        <td class="numero">{{ f['almoco_minutos'] }} min</td>
+        <td class="numero">{{ f['carga_diaria_horas'] }} h</td>
+        <td>{% if f['ativo'] %}Ativo{% else %}Inativo{% endif %}</td>
+        <td class="acoes-linha">
+          <a href="{{ url_for('funcionarios.editar', fid=f['id']) }}" class="botao secundario">Editar</a>
+          <form method="post" action="{{ url_for('funcionarios.situacao', fid=f['id']) }}" class="em-linha">
+            <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+            <button type="submit" class="secundario">{% if f['ativo'] %}Inativar{% else %}Ativar{% endif %}</button>
+          </form>
+          {% if g.usuario['perfil'] == 'admin' %}
+          <form method="post" action="{{ url_for('funcionarios.excluir', fid=f['id']) }}" class="em-linha">
+            <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+            <button type="submit" class="perigo">Excluir</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="8" class="vazio">Nenhum funcionário cadastrado.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="ajuda">Use "Inativar" quando alguém sair do posto: o histórico é preservado. Exclusão é só do administrador e só funciona sem lançamentos.</p>
+{% endblock %}

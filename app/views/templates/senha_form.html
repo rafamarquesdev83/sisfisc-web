@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titulo %}Trocar senha{% endblock %}
+{% block conteudo %}
+<h1>Trocar minha senha</h1>
+
+<form method="post" action="{{ url_for('conta.senha') }}" class="formulario" autocomplete="off">
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+  <label>Senha atual
+    <input type="password" name="atual" required autocomplete="current-password" maxlength="128">
+  </label>
+  <label>Nova senha
+    <input type="password" name="nova" required minlength="12" maxlength="128" autocomplete="new-password">
+    <span class="ajuda">Mín. 12 caracteres, com letras e números, sem o login.</span>
+  </label>
+  <label>Confirme a nova senha
+    <input type="password" name="confirma" required minlength="12" maxlength="128" autocomplete="new-password">
+  </label>
+  <div class="acoes">
+    <a href="{{ url_for('folha.folha') }}" class="botao secundario">Cancelar</a>
+    <button type="submit" class="primario">Salvar nova senha</button>
+  </div>
+</form>
+{% endblock %}

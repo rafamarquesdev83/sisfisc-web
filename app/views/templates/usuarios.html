@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block titulo %}Usuários{% endblock %}
+{% block conteudo %}
+<div class="cabecalho-pagina">
+  <h1>Usuários</h1>
+  <a href="{{ url_for('usuarios.novo') }}" class="botao primario">Novo usuário</a>
+</div>
+
+<div class="tabela-wrap">
+  <table class="tabela">
+    <thead>
+      <tr>
+        <th>Login</th>
+        <th>Nome</th>
+        <th>Perfil</th>
+        <th>Situação</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for u in usuarios %}
+      <tr class="{% if not u['ativo'] %}inativo{% endif %}">
+        <td>{{ u['login'] }}</td>
+        <td>{{ u['nome'] }}</td>
+        <td>{{ 'Administrador' if u['perfil'] == 'admin' else 'Operador' }}</td>
+        <td>{% if u['ativo'] %}Ativo{% else %}Inativo{% endif %}</td>
+        <td class="acoes-linha">
+          {% if u['id'] != g.usuario['id'] %}
+          <form method="post" action="{{ url_for('usuarios.ativo', uid=u['id']) }}" class="em-linha">
+            <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+            <button type="submit" class="secundario">{% if u['ativo'] %}Desativar{% else %}Ativar{% endif %}</button>
+          </form>
+          {% endif %}
+          <form method="post" action="{{ url_for('usuarios.redefinir_senha', uid=u['id']) }}" class="em-linha">
+            <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+            <input type="password" name="senha" placeholder="Nova senha" aria-label="Nova senha de {{ u['login'] }}"
+                   autocomplete="new-password" maxlength="128" required>
+            <button type="submit" class="secundario">Redefinir</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="ajuda">A nova senha segue a mesma política de segurança. Ela nunca é exibida nem registrada na auditoria.</p>
+{% endblock %}

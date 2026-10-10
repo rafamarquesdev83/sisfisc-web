@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{% block titulo %}{% endblock %} · SISFISC</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body>
+{% if g.usuario %}
+<header class="topo">
+  <div class="marca">SISFISC <span>Controle de Limpeza</span></div>
+  <nav class="menu">
+    <a href="{{ url_for('folha.folha') }}" class="{% if request.endpoint == 'folha.folha' %}ativo{% endif %}">Folha diária</a>
+    <a href="{{ url_for('funcionarios.listar') }}" class="{% if request.blueprint == 'funcionarios' %}ativo{% endif %}">Funcionários</a>
+    <a href="{{ url_for('fechamento.mensal') }}" class="{% if request.blueprint == 'fechamento' %}ativo{% endif %}">Fechamento</a>
+    {% if g.usuario['perfil'] == 'admin' %}
+    <a href="{{ url_for('usuarios.listar') }}" class="{% if request.endpoint == 'usuarios.listar' %}ativo{% endif %}">Usuários</a>
+    <a href="{{ url_for('usuarios.auditoria') }}" class="{% if request.endpoint == 'usuarios.auditoria' %}ativo{% endif %}">Auditoria</a>
+    {% endif %}
+  </nav>
+  <div class="sessao">
+    <span>{{ g.usuario['nome'] }}</span>
+    <a href="{{ url_for('conta.senha') }}">Trocar senha</a>
+    <form method="post" action="{{ url_for('auth.logout') }}" class="em-linha">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+      <button type="submit" class="link">Sair</button>
+    </form>
+  </div>
+</header>
+{% endif %}
+
+<main class="conteudo">
+  {% with mensagens = get_flashed_messages(with_categories=true) %}
+    {% for categoria, texto in mensagens %}
+      <div class="aviso aviso-{{ categoria }}" role="status">{{ texto }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  {% block conteudo %}{% endblock %}
+</main>
+</body>
+</html>

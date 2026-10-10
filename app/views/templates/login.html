@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block titulo %}Entrar{% endblock %}
+{% block conteudo %}
+<section class="cartao-login">
+  <div class="marca grande">SISFISC</div>
+  <p class="subtitulo">Controle de horas do efetivo terceirizado</p>
+
+  {% with mensagens = get_flashed_messages(with_categories=true) %}
+    {% for categoria, texto in mensagens %}
+      <div class="aviso aviso-{{ categoria }}" role="alert">{{ texto }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <form method="post" action="{{ url_for('auth.login') }}" class="formulario" autocomplete="on">
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <label>Usuário
+      <input type="text" name="login" autocomplete="username" required maxlength="50" autofocus>
+    </label>
+    <label>Senha
+      <input type="password" name="senha" autocomplete="current-password" required maxlength="128">
+    </label>
+    <button type="submit" class="primario">Entrar</button>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block titulo %}Fechamento{% endblock %}
+{% block conteudo %}
+<h1>Fechamento mensal · {{ rotulo }}</h1>
+
+<div class="barra">
+  <form method="get" action="{{ url_for('fechamento.mensal') }}" class="em-linha">
+    <label>Mês
+      <input type="month" name="mes" value="{{ mes }}" required>
+    </label>
+    <button type="submit" class="secundario">Ver mês</button>
+  </form>
+  <a href="{{ url_for('fechamento.exportar_csv', mes=mes) }}" class="botao primario">Baixar CSV (Excel)</a>
+</div>
+
+<div class="tabela-wrap">
+  <table class="tabela">
+    <thead>
+      <tr>
+        <th>Funcionário</th>
+        <th>Posto</th>
+        <th class="numero">Dias</th>
+        <th class="numero">Horas trabalhadas</th>
+        <th class="numero">Horas previstas</th>
+        <th class="numero">Diferença</th>
+        <th class="numero">Faltas s/ substituto</th>
+        <th class="numero">Substituições</th>
+        <th class="numero">Atraso</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for l in linhas %}
+      {% set d = l.horas - l.previstas %}
+      <tr>
+        <td>{{ l.nome }}</td>
+        <td>{{ l.posto }}</td>
+        <td class="numero">{{ l.dias }}</td>
+        <td class="numero">{{ fmt(l.horas) }}</td>
+        <td class="numero">{{ fmt(l.previstas) }}</td>
+        <td class="numero {% if d < 0 %}negativo{% endif %}">{{ '-' if d < 0 else '+' if d > 0 else '' }}{{ fmt(d|abs) }}</td>
+        <td class="numero">{{ l.faltas_sem }}</td>
+        <td class="numero">{{ l.substituicoes }}</td>
+        <td class="numero">{{ fmt(l.atraso) }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="9" class="vazio">Nenhum funcionário cadastrado.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="ajuda">Horas previstas = dias úteis (seg a sex) × carga diária. Feriados não são descontados automaticamente.</p>
+{% endblock %}

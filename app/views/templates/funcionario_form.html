@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block conteudo %}
+{% set f = funcionario or {} %}
+<h1>{{ titulo }}</h1>
+
+<form method="post" class="formulario largo"
+      action="{% if fid is defined %}{{ url_for('funcionarios.editar', fid=fid) }}{% else %}{{ url_for('funcionarios.novo') }}{% endif %}">
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+
+  <label>Nome completo
+    <input type="text" name="nome" value="{{ f['nome']|default('') }}" required minlength="3" maxlength="80">
+  </label>
+  <label>Matrícula
+    <input type="text" name="matricula" value="{{ f['matricula']|default('') }}" maxlength="20">
+  </label>
+  <label>Função
+    <input type="text" name="funcao" value="{{ f['funcao']|default('') }}" maxlength="40">
+  </label>
+  <label>Posto
+    <input type="text" name="posto" value="{{ f['posto']|default('') }}" maxlength="80">
+  </label>
+
+  <fieldset class="grupo">
+    <legend>Escala</legend>
+    <label>Entrada
+      <input type="time" name="entrada_escala" value="{{ f['entrada_escala']|default('06:00') }}" required>
+    </label>
+    <label>Saída
+      <input type="time" name="saida_escala" value="{{ f['saida_escala']|default('16:00') }}" required>
+    </label>
+    <label>Almoço (min)
+      <input type="number" name="almoco_minutos" min="0" max="240" value="{{ f['almoco_minutos']|default(60) }}" required>
+    </label>
+    <label>Carga diária (h)
+      <input type="number" name="carga_diaria_horas" min="1" max="12" step="0.5" value="{{ f['carga_diaria_horas']|default(8) }}" required>
+    </label>
+  </fieldset>
+
+  <div class="acoes">
+    <a href="{{ url_for('funcionarios.listar') }}" class="botao secundario">Cancelar</a>
+    <button type="submit" class="primario">Salvar</button>
+  </div>
+</form>
+{% endblock %}

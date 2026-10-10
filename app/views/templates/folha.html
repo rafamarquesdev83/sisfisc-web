@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block titulo %}Folha diária{% endblock %}
+{% block conteudo %}
+<h1>Lançamento diário</h1>
+
+<form method="get" action="{{ url_for('folha.folha') }}" class="barra">
+  <label>Data da folha
+    <input type="date" name="data" value="{{ data.isoformat() }}" required>
+  </label>
+  <button type="submit" class="secundario">Abrir data</button>
+</form>
+
+<p class="destaque">Folha de <strong>{{ data.strftime('%d/%m/%Y') }}</strong></p>
+
+<form method="post" action="{{ url_for('folha.folha') }}">
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+  <input type="hidden" name="data" value="{{ data.isoformat() }}">
+
+  <div class="tabela-wrap">
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>Funcionário</th>
+          <th>Posto</th>
+          <th>Escala</th>
+          <th>Situação</th>
+          <th>Entrada</th>
+          <th>Saída</th>
+          <th>Substituto</th>
+          <th>Observação</th>
+          <th>Horas</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for l in linhas %}
+        <tr>
+          <td>{{ l.nome }}</td>
+          <td>{{ l.posto }}</td>
+          <td>{{ l.escala }}</td>
+          <td>
+            <select name="sit_{{ l.id }}" aria-label="Situação de {{ l.nome }}">
+              <option value="">— não lançado —</option>
+              {% for codigo, rotulo in situacoes.items() %}
+                <option value="{{ codigo }}" {% if l.sit == codigo %}selected{% endif %}>{{ rotulo }}</option>
+              {% endfor %}
+            </select>
+          </td>
+          <td><input type="time" name="ent_{{ l.id }}" value="{{ l.ent }}" aria-label="Entrada de {{ l.nome }}"></td>
+          <td><input type="time" name="sai_{{ l.id }}" value="{{ l.sai }}" aria-label="Saída de {{ l.nome }}"></td>
+          <td><input type="text" name="sub_{{ l.id }}" value="{{ l.sub }}" maxlength="80" aria-label="Substituto de {{ l.nome }}"></td>
+          <td><input type="text" name="obs_{{ l.id }}" value="{{ l.obs }}" maxlength="200" aria-label="Observação de {{ l.nome }}"></td>
+          <td class="numero">{{ l.horas }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="9" class="vazio">Nenhum funcionário ativo. Cadastre o efetivo primeiro.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <p class="ajuda">Deixar "não lançado" apaga o lançamento daquele funcionário nesta data.
+    Substituído exige o nome do substituto. Saída precisa ser depois da entrada.</p>
+
+  {% if linhas %}
+  <div class="acoes">
+    <button type="submit" class="primario">Salvar folha do dia</button>
+  </div>
+  {% endif %}
+</form>
+{% endblock %}
